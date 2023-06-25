@@ -1,12 +1,23 @@
-val scala3Version = "3.3.0"
+ThisBuild / scalaVersion := "3.3.0"
 
-lazy val root = project
+lazy val http4sVersion = "0.23.20"
+lazy val http4sServer = "org.http4s" %% "http4s-ember-server" % http4sVersion
+lazy val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
+lazy val http4sClient = "org.http4s" %% "http4s-ember-client" % http4sVersion
+
+lazy val balancer = project
   .in(file("."))
+  .aggregate(`gw-refs-http4s`, `gw-semaphore-http4s`)
+
+lazy val `gw-refs-http4s` = project
+  .in(file("gw-refs-http4s"))
   .settings(
-    name := ".",
-    version := "0.1.0-SNAPSHOT",
+    name := "gw-refs-http4s"
+  )
 
-    scalaVersion := scala3Version,
-
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+lazy val `gw-semaphore-http4s` = project
+  .in(file("gw-semaphore-http4s"))
+  .settings(
+    name := "gw-semaphore-http4s",
+    libraryDependencies := Seq(http4sClient, http4sDsl, http4sServer)
   )
