@@ -7,7 +7,7 @@ lazy val http4sClient = "org.http4s" %% "http4s-ember-client" % http4sVersion
 
 lazy val balancer = project
   .in(file("."))
-  .aggregate(`gw-refs-http4s`, `gw-semaphore-http4s`)
+  .aggregate(`gw-refs-http4s`, `gw-semaphore-http4s`, `gw-test`)
 
 lazy val `gw-refs-http4s` = project
   .in(file("gw-refs-http4s"))
@@ -21,3 +21,7 @@ lazy val `gw-semaphore-http4s` = project
     name := "gw-semaphore-http4s",
     libraryDependencies := Seq(http4sClient, http4sDsl, http4sServer)
   )
+
+lazy val `gw-test` = project
+  .in(file("gw-test"))
+  .settings(name := "gw-test")
