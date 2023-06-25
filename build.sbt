@@ -1,4 +1,5 @@
 ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / scalacOptions += "-Wunused:all"
 
 lazy val http4sVersion = "0.23.20"
 lazy val http4sServer = "org.http4s" %% "http4s-ember-server" % http4sVersion
@@ -12,7 +13,8 @@ lazy val balancer = project
 lazy val `gw-refs-http4s` = project
   .in(file("gw-refs-http4s"))
   .settings(
-    name := "gw-refs-http4s"
+    name := "gw-refs-http4s",
+    libraryDependencies := Seq(http4sClient, http4sDsl, http4sServer)
   )
 
 lazy val `gw-semaphore-http4s` = project
@@ -24,4 +26,6 @@ lazy val `gw-semaphore-http4s` = project
 
 lazy val `gw-test` = project
   .in(file("gw-test"))
-  .settings(name := "gw-test")
+  .settings(
+    name := "gw-test"
+  )
