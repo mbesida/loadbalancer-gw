@@ -20,13 +20,19 @@ object Server extends IOApp.Simple {
   def service(balancer: LoadBalancer) = HttpRoutes.of[IO]:
     case req @ GET -> Root / "get-fortune" => balancer.loadBalance(req)
 
-
   override def run: IO[Unit] =
-    EmberClientBuilder.default[IO].build.flatMap { client =>
-      EmberServerBuilder.default[IO]
-        .withHost(ipv4"0.0.0.0").withPort(port"8000")
-        .withHttpApp(service(LoadBalancer(client, workers)).orNotFound).build
-    }.use { _ =>
-      IO.println("Load balancer has started") *> IO.never
-    }
+    EmberClientBuilder
+      .default[IO]
+      .build
+      .flatMap { client =>
+        EmberServerBuilder
+          .default[IO]
+          .withHost(ipv4"0.0.0.0")
+          .withPort(port"8000")
+          .withHttpApp(service(LoadBalancer(client, workers)).orNotFound)
+          .build
+      }
+      .use { _ =>
+        IO.println("Load balancer has started") *> IO.never
+      }
 }

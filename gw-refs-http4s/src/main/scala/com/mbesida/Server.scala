@@ -20,15 +20,17 @@ object Server extends IOApp.Simple:
   def service(balancer: LoadBalancerOnRef) = HttpRoutes.of[IO]:
     case req @ GET -> Root / "get-fortune" => balancer.loadBalance(req)
 
-  val serverResource = 
-    for 
+  val serverResource =
+    for
       client <- EmberClientBuilder.default[IO].build
       gw <- Resource.eval(LoadBalancerOnRef(client, workers))
-      server <- EmberServerBuilder.default[IO]
-        .withHost(ipv4"0.0.0.0").withPort(port"8000")
-        .withHttpApp(service(gw).orNotFound).build
+      server <- EmberServerBuilder
+        .default[IO]
+        .withHost(ipv4"0.0.0.0")
+        .withPort(port"8000")
+        .withHttpApp(service(gw).orNotFound)
+        .build
     yield server
-
 
   override def run: IO[Unit] =
     serverResource.use { _ =>

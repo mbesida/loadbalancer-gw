@@ -14,18 +14,13 @@ object LoadBalancerOnRef:
 
   private val SleepDuration = 1500.millis
 
-  private def lockService(
-      busyMap: Map[Uri, Boolean]
-  ): (Map[Uri, Boolean], Option[Uri]) =
+  private def lockService(busyMap: Map[Uri, Boolean]): (Map[Uri, Boolean], Option[Uri]) =
     busyMap
       .find((_, isBusy) => !isBusy)
       .map((u, _) => (busyMap.updated(u, true), Some(u)))
       .getOrElse((busyMap, None))
 
-  def apply(
-      client: Client[IO],
-      serviceUrls: Seq[Uri]
-  ): IO[LoadBalancerOnRef] =
+  def apply(client: Client[IO], serviceUrls: Seq[Uri]): IO[LoadBalancerOnRef] =
 
     val mutexIO = IO.ref(
       serviceUrls.zip(List.fill(serviceUrls.length)(false)).toMap
