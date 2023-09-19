@@ -26,14 +26,13 @@ object Test extends App:
             BodyHandlers.ofString()
           )
           .asScala
-          .map(httpResponse =>
-            (i, httpResponse.statusCode(), httpResponse.body(), System.currentTimeMillis() - start)
-          )
+          .map{ httpResponse =>
+            val (status, duration, body) = (httpResponse.statusCode(), System.currentTimeMillis() - start, httpResponse.body())
+            println(s"$i - $duration ms - status $status - $body")
+          }
       }
     }
 
   val start = System.currentTimeMillis()
-  Await.result(result, Duration.Inf).foreach { (i, status, body, duration) =>
-    println(s"$i - $duration ms - status $status - $body")
-  }
+  Await.result(result, Duration.Inf)
   println(s"Took ${System.currentTimeMillis() - start} ms")
