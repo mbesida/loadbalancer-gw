@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 const port = 8000
@@ -14,18 +15,25 @@ var workers = []string{
 	"http://localhost:9551",
 	"http://localhost:9552",
 	"http://localhost:9553",
+	"http://localhost:9554",
+}
+
+func setupLogging() {
+
 }
 
 func parseUrl(u string) url.URL {
 	url, err := url.Parse(u)
 	if err != nil {
-		panic("Incorrect worker url. Chnage the configuration")
+		log.Fatalln("Incorrect worker url. Chnage the configuration")
 	}
 	return *url
 }
 
 func main() {
-	urls := make([]url.URL, len(workers))
+	setupLogging()
+
+	var urls []url.URL = make([]url.URL, len(workers))
 
 	for i, u := range workers {
 		urls[i] = parseUrl(u)
@@ -38,10 +46,10 @@ func main() {
 	l, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	log.Printf("Load balancer has started on port %d and balancing among following %v workers\n", port, workers)
+	log.Printf("Load balancer has started on port %d and balancing among following workers:\n%s", port, strings.Join(workers, "\n"))
 
-	log.Fatal(http.Serve(l, nil))
+	log.Fatalln(http.Serve(l, nil))
 }
