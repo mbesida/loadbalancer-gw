@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -19,7 +21,8 @@ var workers = []string{
 }
 
 func setupLogging() {
-
+	l := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	slog.SetDefault(l)
 }
 
 func parseUrl(u string) url.URL {
@@ -49,7 +52,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	log.Printf("Load balancer has started on port %d and balancing among following workers:\n%s", port, strings.Join(workers, "\n"))
+	log.Printf("Load balancer has started on port %d and balancing among following workers: %s",
+		port, strings.Join(workers, ", "))
 
 	log.Fatalln(http.Serve(l, nil))
 }

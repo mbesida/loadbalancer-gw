@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -52,15 +52,16 @@ func (b *Balancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *Balancer) loadBalance(w http.ResponseWriter, r *http.Request, attempt int) {
+	attemptNumber := attempt + 1
 	for wh, worker := range b.workers {
 		if worker.proxyRequest(w, r) {
-			log.Printf("Success from %d attempt for worker %s\n", attempt+1, wh.Host)
+			slog.Debug("Success", "attempt", attemptNumber, "worker", wh.Host)
 			return
 		}
 	}
-	log.Printf("All workers are busy. Client %s is waiting. Attempt %d\n", r.RemoteAddr, attempt+1)
+	slog.Debug("All workers are busy", "client", r.RemoteAddr, "attempt", attemptNumber)
 	time.Sleep(sleepDuration)
-	b.loadBalance(w, r, attempt+1)
+	b.loadBalance(w, r, attemptNumber)
 }
 
 func makeProxy(u url.URL) httputil.ReverseProxy {
