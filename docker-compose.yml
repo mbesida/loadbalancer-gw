@@ -21,9 +21,3 @@ services:
       - "9553:9551"
     environment:
       - WORKER_PORT=9551
-  worker4:
-    image: thereisnospoon/wm-test-worker:0.1.1
-    ports:
-      - "9554:9551"
-    environment:
-      - WORKER_PORT=9551
