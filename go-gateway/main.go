@@ -11,13 +11,15 @@ import (
 	"strings"
 )
 
-const port = 8000
+const (
+	Port     = 8000
+	Endpoint = "/get-fortune"
+)
 
 var workers = []string{
 	"http://localhost:9551",
 	"http://localhost:9552",
 	"http://localhost:9553",
-	"http://localhost:9554",
 }
 
 func setupLogging() {
@@ -42,18 +44,18 @@ func main() {
 		urls[i] = parseUrl(u)
 	}
 
-	balancer := NewBalancer(urls)
+	balancer := NewBalancer2(urls)
 
-	http.Handle("/get-fortune", balancer)
+	http.Handle(Endpoint, balancer)
 
-	l, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+	l, err := net.Listen("tcp", ":"+strconv.Itoa(Port))
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	log.Printf("Load balancer has started on port %d and balancing among following workers: %s",
-		port, strings.Join(workers, ", "))
+		Port, strings.Join(workers, ", "))
 
 	log.Fatalln(http.Serve(l, nil))
 }
